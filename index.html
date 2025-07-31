@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tattoo Rate Calculator</title>
+
+
+
+  <style>
+  * {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+  margin: 0;
+  padding: 0;
+  background: #0f0f0f;
+  color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+
+  .container {
+    background: #1e1e1e;
+    padding: 2rem 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    max-width: 900px;
+    width: 100%;
+    margin: 2rem;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    letter-spacing: 0.5px;
+  }
+
+  .part-block {
+    background: #252525;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid #ff6f3c;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .part-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .part-grid-full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 0.65rem;
+    margin-bottom: 0.5rem;
+    background: #2b2b2b;
+    color: #f5f5f5;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+  }
+
+  button {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    background: #ff6f3c;
+    color: #fff;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 0.75rem;
+    margin-right: 0.5rem;
+  }
+
+  button:hover {
+    background: #ff3c2f;
+    transform: scale(1.02);
+  }
+
+  .danger-btn {
+    background: #cc3333;
+  }
+
+  .danger-btn:hover {
+    background: #aa2222;
+  }
+
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .result {
+    margin-top: 2rem;
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: bold;
+    white-space: pre-line;
+  }
+
+  @media screen and (max-width: 768px) {
+    .container {
+      padding: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+    }
+
+    .part-grid {
+      grid-template-columns: 1fr;
+    }
+
+    input, select {
+      font-size: 0.95rem;
+    }
+
+    label {
+      font-size: 0.9rem;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+</style>
+
+
+
+</head>
+<body>
+  <div class="container">
+    <h1>Tattoo Rate Calculator</h1>
+    <div id="parts-container">
+      <!-- Part fields will appear here -->
+    </div>
+
+    <button onclick="addPart()">+ Add Part</button>
+    <button onclick="calculateTotal()">Calculate Total</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+<script>
+  let partIndex = 0;
+  const parts = [];
+
+  function addPart() {
+  const container = document.getElementById('parts-container');
+  const id = partIndex++;
+  parts.push(id);
+
+  const div = document.createElement('div');
+  div.classList.add('part-block');
+  div.setAttribute('id', `part-${id}`);
+
+  div.innerHTML = `
+    <div class="part-grid">
+      <div>
+        <label>Part ${id + 1} - Width (inches)</label>
+        <input type="number" id="width-${id}" min="1" step="any" inputmode="decimal" required />
+      </div>
+
+      <div>
+        <label>Height (inches)</label>
+        <input type="number" id="height-${id}" min="1" step="any" inputmode="decimal" required />
+      </div>
+
+      <div>
+        <label>Complexity Rate</label>
+        <select id="complexity-${id}">
+          <option value="120">✍️ Basic</option>
+          <option value="150">🧩 Fine Line</option>
+          <option value="200">🌀 Semi-Detailed</option>
+          <option value="250">🔲 Detailed</option>
+          <option value="360">🎨 High Detail</option>
+          <option value="420">🔥 Full Realism</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Complexity Level</label>
+        <input type="number" id="level-${id}" min="0" step="1" inputmode="numeric" required />
+      </div>
+
+      <div class="part-grid-full">
+        <button onclick="removePart(${id})" class="danger-btn">🗑️ Remove Part</button>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(div);
+
+  // Autofocus first input for better UX
+  div.querySelector(`#width-${id}`).focus();
+}
+
+
+  function removePart(id) {
+    const div = document.getElementById(`part-${id}`);
+    if (div) {
+      div.remove();
+      const index = parts.indexOf(id);
+      if (index !== -1) parts.splice(index, 1);
+    }
+  }
+
+  function calculateTotal() {
+    let totalCost = 0;
+    let valid = true;
+    let totalCM = 0;
+
+    if (parts.length === 0) {
+      document.getElementById('result').innerText = 'Please add at least one part.';
+      return;
+    }
+
+    for (const id of parts) {
+      const width = parseFloat(document.getElementById(`width-${id}`).value);
+      const height = parseFloat(document.getElementById(`height-${id}`).value);
+      const rate = parseFloat(document.getElementById(`complexity-${id}`).value);
+      const level = parseInt(document.getElementById(`level-${id}`).value);
+
+      if (
+        isNaN(width) || width <= 0 ||
+        isNaN(height) || height <= 0 ||
+        isNaN(rate) ||
+        isNaN(level) || level < 0
+      ) {
+        valid = false;
+        break;
+      }
+
+      const partCM = (width + height) * 2.54;
+      const levelRate = rate * Math.pow(1.05, level);
+      totalCM += partCM;
+      totalCost += partCM * levelRate;
+    }
+
+    if (!valid) {
+      document.getElementById('result').innerText = 'Please fill in all part fields correctly.';
+      return;
+    }
+
+    let discount = 0;
+    if (parts.length >= 2) {
+      // Example discount logic: 0.02% per cm up to 10%
+      discount = Math.min(totalCM * 0.002, 0.10); // 0.02% per cm, max 10%
+    }
+
+    const finalPrice = Math.round(totalCost * (1 - discount));
+
+    document.getElementById('result').innerText =
+      `Total Parts: ${parts.length}
+Discount: ${Math.round(discount * 100)}%
+Final Estimated Cost: ₱${finalPrice} PHP`;
+  }
+
+  addPart();
+</script>
+
+
+</body>
+</html>
